@@ -75,3 +75,10 @@ Syntax highlighted code block
 ### Support or Contact
 
 readme 파일 생성에 추가적인 도움이 필요하면 [도움말](https://help.github.com/articles/about-readmes/) 이나 [contact support](https://github.com/contact) 을 이용하세요.
+
+
+### 필수 기능 정의
+1. 영수증 인식
+2. 추출값 가공 (구조화)
+3. 결과값 엑셀 저장
+4. 사용자 UI (?)
