@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>694</width>
-    <height>49</height>
+    <height>342</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -66,6 +66,26 @@
    </property>
    <property name="text">
     <string>실행</string>
+   </property>
+  </widget>
+  <widget class="QTableView" name="tv_receipt">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>50</y>
+     <width>181</width>
+     <height>281</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QTableView" name="tv_receipt_result">
+   <property name="geometry">
+    <rect>
+     <x>200</x>
+     <y>50</y>
+     <width>481</width>
+     <height>281</height>
+    </rect>
    </property>
   </widget>
  </widget>
