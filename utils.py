@@ -22,5 +22,5 @@ def load_settings_yaml(filename):
         return yaml.safe_load(file)
 
 
-utils.init_settings()
-print(1)
+# utils.init_settings()
+# print(1)
