@@ -1,7 +1,7 @@
 import os
 from PyQt5 import uic
-from PyQt5.QtWidgets import QMainWindow, QFileDialog
-
+from PyQt5.QtGui import QStandardItemModel, QStandardItem
+from PyQt5.QtWidgets import QMainWindow, QFileDialog, QHeaderView, QAbstractItemView
 
 base_path = os.path.dirname(os.path.abspath(__file__))
 
@@ -14,11 +14,23 @@ class MainWindow(QMainWindow):
 
     def init_ui(self):
         self.setWindowTitle("영수증 관리 프로그램 v1.0.0")
-        self.setFixedSize(694, 49)
+        self.setFixedSize(694, 345)
 
         # button
         self.btn_receipt_folder.clicked.connect(self.on_excel)
         self.btn_execute.clicked.connect(self.on_execute)
+
+        header = self.tv_receipt.horizontalHeader()
+        header.setSectionResizeMode(QHeaderView.Stretch)
+        self.tv_receipt.setEditTriggers(QAbstractItemView.NoEditTriggers)
+        self.tv_receipt_result.setEditTriggers(QAbstractItemView.NoEditTriggers)
+
+        self.init_data_setting()
+
+    def init_data_setting(self):
+        self.txt_receipt_folder.setText(utils.settings["init_excel_filepath"])
+        if self.txt_receipt_folder.text() != "":
+            self.set_table_data()
 
     def on_excel(self):
         print("on_excel called")
