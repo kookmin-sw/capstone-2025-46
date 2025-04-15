@@ -5,6 +5,8 @@ from PyQt5 import uic
 from PyQt5.QtGui import QStandardItemModel, QStandardItem
 from PyQt5.QtWidgets import QMainWindow, QFileDialog, QHeaderView, QAbstractItemView
 
+from worker import Worker
+
 base_path = os.path.dirname(os.path.abspath(__file__))
 
 
@@ -17,6 +19,9 @@ class MainWindow(QMainWindow):
     def init_ui(self):
         self.setWindowTitle("영수증 관리 프로그램 v1.0.0")
         self.setFixedSize(694, 345)
+
+        self.worker_thread = Worker(self)
+        self.worker_thread.start()
 
         # button
         self.btn_receipt_folder.clicked.connect(self.on_excel)
