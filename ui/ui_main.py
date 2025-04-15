@@ -1,3 +1,4 @@
+import logging_config
 import utils
 import os
 from PyQt5 import uic
@@ -76,4 +77,4 @@ class MainWindow(QMainWindow):
         self.tv_receipt.setModel(model)
 
     def on_execute(self):
-        print("on_execute called")
+        logging_config.logger.debug("on_execute called")
