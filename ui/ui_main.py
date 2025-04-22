@@ -1,3 +1,7 @@
+import pandas as pd
+import shutil
+import sys
+
 import logging_config
 import utils
 import os
@@ -9,6 +13,13 @@ from PyQt5.QtWidgets import QMainWindow, QFileDialog, QHeaderView, QAbstractItem
 from worker import Worker
 
 base_path = os.path.dirname(os.path.abspath(__file__))
+if getattr(sys, 'frozen', False):
+    # frozen 속성이 있으면 exe로 빌드된 상태이므로, sys.executable 사용
+    project_path = os.path.dirname(sys.executable)
+else:
+    # 그렇지 않으면 __file__을 기준으로 경로 설정
+    project_path = os.path.dirname(os.path.abspath(__file__))
+root_path = project_path.replace("ui", "")
 
 
 class MainWindow(QMainWindow):
@@ -29,6 +40,7 @@ class MainWindow(QMainWindow):
         # button
         self.btn_receipt_folder.clicked.connect(self.on_excel)
         self.btn_execute.clicked.connect(self.on_execute)
+        self.btn_save.clicked.connect(self.on_save)
 
         header = self.tv_receipt.horizontalHeader()
         header.setSectionResizeMode(QHeaderView.Stretch)
@@ -139,3 +151,60 @@ class MainWindow(QMainWindow):
         # QTableView 업데이트
         self.tv_receipt_result.setModel(model)
         self.tv_receipt_result.viewport().update()
+
+    def on_save(self):
+        # QTableView에서 모델을 가져옵니다.
+        model = self.tv_receipt_result.model()
+
+        # 모델에서 데이터를 DataFrame으로 변환
+        data = []
+        for row in range(model.rowCount()):
+            row_data = []
+            for column in range(model.columnCount()):
+                index = model.index(row, column)
+                row_data.append(index.data())
+            data.append(row_data)
+
+        # DataFrame 생성
+        df = pd.DataFrame(data, columns=models.header)
+        df = df[['승인일', '상호', '금액', '카드 번호']]
+        df['카드 번호'] = df['카드 번호'].apply(lambda x: x[-4:])
+        df['증빙유무'] = '유'
+
+        # 모델에서 헤더 정보를 가져옵니다.
+        # headers = [model.headerData(i, Qt.Horizontal) for i in range(model.columnCount())]
+        # df.columns = headers  # DataFrame에 헤더를 설정
+
+        # 저장할 파일 경로 선택 (파일 다이얼로그)
+        file_name, _ = QFileDialog.getSaveFileName(self, 'Save File', '', 'Excel Files (*.xlsx)')
+        if file_name:
+            with pd.ExcelWriter(file_name, engine='xlsxwriter') as writer:
+                # 첫 번째 시트에 데이터 저장
+                df.to_excel(writer, index=False, header=True, sheet_name='Sheet1')
+
+                # 워크북과 워크시트 객체 얻기
+                workbook = writer.book
+                worksheet1 = writer.sheets['Sheet1']
+
+                # request 폴더에서 이미지 파일 리스트 가져오기
+                folder_path = self.txt_receipt_folder.text()
+                image_files = [f for f in os.listdir(folder_path) if f.lower().endswith('.jpg')]
+
+                # 두 번째 시트에 이미지 추가
+                worksheet2 = workbook.add_worksheet('Sheet2')
+
+                done_folder = os.path.join(root_path, "done")
+                # 이미지 삽입 (여러 이미지를 순차적으로 삽입)
+                row = 0  # 첫 번째 행부터 시작
+                for image_file in image_files:
+                    image_path = os.path.join(folder_path, image_file)
+                    worksheet2.insert_image(row, 0, image_path)
+                    row += 40  # 각 이미지를 15행씩 간격을 두고 삽입 (적절히 조정)
+
+                # Excel 파일 저장
+                workbook.close()
+
+            for image_file in image_files:
+                image_path = os.path.join(folder_path, image_file)
+                done_file_path = os.path.join(done_folder, image_file)
+                shutil.move(image_path, done_file_path)
