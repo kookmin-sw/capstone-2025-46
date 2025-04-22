@@ -1,9 +1,10 @@
 import logging_config
 import utils
 import os
+import models
 from PyQt5 import uic
 from PyQt5.QtGui import QStandardItemModel, QStandardItem
-from PyQt5.QtWidgets import QMainWindow, QFileDialog, QHeaderView, QAbstractItemView
+from PyQt5.QtWidgets import QMainWindow, QFileDialog, QHeaderView, QAbstractItemView, QMessageBox
 
 from worker import Worker
 
@@ -21,6 +22,8 @@ class MainWindow(QMainWindow):
         self.setFixedSize(694, 345)
 
         self.worker_thread = Worker(self)
+        self.worker_thread.update_ui.connect(self.update_log)
+        self.worker_thread.update_row_by_url_signal.connect(self.update_row_by_url)  # URL 업데이트 연결
         self.worker_thread.start()
 
         # button
@@ -83,3 +86,56 @@ class MainWindow(QMainWindow):
 
     def on_execute(self):
         logging_config.logger.debug("on_execute called")
+        self.worker_thread.add_command("on_work")
+
+    def update_log(self, message):
+        logging_config.logger.debug(f"update_log called - {message}")
+        QMessageBox.warning(self, "경고", message)
+
+    def update_row_by_url(self, ai_result: dict):
+        # QTableView 모델 가져오기
+        model = self.tv_receipt_result.model()
+
+        # 모델이 없으면 새로 생성
+        if model is None:
+            model = QStandardItemModel()
+            model.setHorizontalHeaderLabels(models.header)
+            self.tv_receipt_result.setModel(model)
+
+        # AiResult의 딕셔너리에서 값을 가져와서 테이블에 추가
+        row_data = [
+            ai_result.get('merchant_name', ''),
+            ai_result.get('merchant_id', ''),
+            ai_result.get('address', ''),
+            ai_result.get('card_number', ''),
+            ai_result.get('approval_date', ''),
+            ai_result.get('amount', ''),
+            ai_result.get('transaction_type', ''),
+            ai_result.get('issue_date', ''),
+            ai_result.get('issue_time', ''),
+            ai_result.get('representative_phone', ''),
+            ai_result.get('train_type', ''),
+            ai_result.get('train_number', ''),
+            ai_result.get('departure', ''),
+            ai_result.get('departure_time', ''),
+            ai_result.get('arrival', ''),
+            ai_result.get('arrival_time', ''),
+            ai_result.get('adult_count', ''),
+            ai_result.get('child_count', ''),
+            ai_result.get('discount', ''),
+            ai_result.get('receipt_number', ''),
+            ai_result.get('note', '')
+        ]
+
+        # 모델에 새로운 행 추가
+        row_position = model.rowCount()
+        model.insertRow(row_position)
+
+        # 데이터 채우기
+        for col, value in enumerate(row_data):
+            item = QStandardItem(str(value))  # 값이 None이면 빈 문자열을 대입
+            model.setItem(row_position, col, item)
+
+        # QTableView 업데이트
+        self.tv_receipt_result.setModel(model)
+        self.tv_receipt_result.viewport().update()

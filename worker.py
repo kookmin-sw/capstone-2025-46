@@ -47,7 +47,7 @@ class Worker(QThread):
                     ext = os.path.splitext(file_name)[1].lower()
                     if ext in ['.jpg', '.jpeg', '.png']:
                         ai_result = utils_ncp_clova.process_ocr(file_path)
-                        print(1)
+                        self.update_row_by_url_signal.emit(ai_result.get("receipt"))
                     else:
                         logging_config.logger.debug("지원하지 않는 파일 포맷: %s", file_name)
         else:
