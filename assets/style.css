@@ -20,3 +20,42 @@ h2 {
 ol, ul {
   margin-left: 1.2rem;
 }
+
+.navbar {
+  background: #f8f8f8;
+  padding: 0.5rem 1rem;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  border-bottom: 1px solid #ddd;
+}
+
+.menu {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  text-align: center;
+}
+
+.menu li {
+  display: inline;
+  margin: 0 0.5rem;
+  font-weight: bold;
+}
+
+/* li 사이에 구분자 “|” 넣기 */
+.menu li + li:before {
+  content: "|";
+  margin: 0 0.5rem;
+  color: #aaa;
+}
+
+/* 링크 스타일 */
+.menu a {
+  text-decoration: none;
+  color: #333;
+}
+
+.menu a:hover {
+  text-decoration: underline;
+}
