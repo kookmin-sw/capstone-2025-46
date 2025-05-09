@@ -16,7 +16,6 @@ h2 {
   font-size: 1.5rem;
   border-bottom: 2px solid #ddd;
   padding-bottom: 0.3rem;
-  scroll-margin-top: 60px;
 }
 ol, ul {
   margin-left: 1.2rem;
@@ -109,7 +108,7 @@ ol, ul {
   color: #fff;
 }
 
-section {
-  /* 네비바 높이만큼(예: 60px) 스크롤 마진을 준다 */
-  scroll-margin-top: 60px;
+section:target {
+  padding-top: 60px;   /* 네비바 높이 만큼 공간 확보 */
+  margin-top: -60px;   /* 레이아웃 밀림 보정 */
 }
