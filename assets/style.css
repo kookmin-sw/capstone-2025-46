@@ -63,13 +63,14 @@ ol, ul {
 /* 버튼 컨테이너 */
 .presentation-links {
   display: flex;
-  flex-direction: column;
-  gap: 1rem;           /* 버튼 간격 */
-  flex-wrap: wrap;     /* 좁아지면 다음 줄로 */
+  flex-direction: column;    /* 세로 정렬 */
+  gap: 1rem;                 /* 버튼 간격 */
   margin-top: 1rem;
+  
+  align-items: flex-start;   /* 자식 아이템 폭을 내용물 크기에 맞춤 */
 }
 
-/* 다운로드 버튼 스타일 */
+/* 기존 download-btn 에 width:auto 를 명시해도 됩니다 */
 .download-btn {
   display: inline-flex;
   align-items: center;
@@ -81,6 +82,9 @@ ol, ul {
   color: #007bff;
   background-color: #fff;
   transition: background-color 0.2s, color 0.2s;
+  
+  width: auto;               /* 기본 콘텐츠 너비에 맞춤 */
+  align-self: flex-start;    /* 개별 아이템도 좌측 정렬 */
 }
 
 /* 아이콘과 텍스트 간격 */
