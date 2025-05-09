@@ -59,3 +59,50 @@ ol, ul {
 .menu a:hover {
   text-decoration: underline;
 }
+
+/* 버튼 컨테이너 */
+.presentation-links {
+  display: flex;
+  gap: 1rem;           /* 버튼 간격 */
+  flex-wrap: wrap;     /* 좁아지면 다음 줄로 */
+  margin-top: 1rem;
+}
+
+/* 다운로드 버튼 스타일 */
+.download-btn {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.6rem 1.2rem;
+  border: 2px solid #007bff;
+  border-radius: 0.5rem;
+  text-decoration: none;
+  font-weight: 500;
+  color: #007bff;
+  background-color: #fff;
+  transition: background-color 0.2s, color 0.2s;
+}
+
+/* 아이콘과 텍스트 간격 */
+.download-btn::before {
+  content: '';
+  display: inline-block;
+  width: 1.2rem;
+  height: 1.2rem;
+  margin-right: 0.5rem;
+  background-size: contain;
+  background-repeat: no-repeat;
+}
+
+/* 버튼별 아이콘 지정 (optional) */
+.download-btn[href$=".jpg"]::before {
+  background-image: url('data:image/svg+xml;utf8,<svg fill="%23007bff" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M5 20h14v-2H5v2zm7-18L5.33 9h3.34v4h6.66V9h3.34L12 2z"/></svg>');
+}
+.download-btn[href$=".pptx"]::before {
+  background-image: url('data:image/svg+xml;utf8,<svg fill="%23007bff" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14l4-4h12c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2z"/></svg>');
+}
+
+/* 호버 효과 */
+.download-btn:hover {
+  background-color: #007bff;
+  color: #fff;
+}
