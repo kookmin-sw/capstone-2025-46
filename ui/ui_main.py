@@ -1,3 +1,4 @@
+import time
 import pandas as pd
 import shutil
 import sys
@@ -174,18 +175,22 @@ class MainWindow(QMainWindow):
         df['카드 번호'] = df['카드 번호'].apply(lambda x: x[-4:])
         df['증빙유무'] = '유'
 
+        # 승인일 기준으로 오름차순 정렬
+        df = df.sort_values(by='승인일', ascending=True).reset_index(drop=True)
+
         # 2. 파일 경로 및 복사
         folder_path = self.txt_receipt_folder.text()
         today_str = datetime.today().strftime("%Y%m%d")
         template_path = os.path.join(root_path, "법인카드 사용내역.xlsx")
-        output_path = os.path.join(folder_path, f"법인카드 사용내역_작성본_{today_str}.xlsx")
+        output_path = os.path.join("C:\\Users\\cjdtn\\OneDrive", f"법인카드 사용내역_작성본_{today_str}.xlsx")
 
         shutil.copyfile(template_path, output_path)
+        time.sleep(2)
 
         # 3. Excel 열기
         excel = win32.gencache.EnsureDispatch('Excel.Application')
         excel.Visible = False
-        wb = excel.Workbooks.Open(output_path)
+        wb = excel.Workbooks.Open(output_path, ReadOnly=False)
 
         # 4. 데이터 시트 처리 (Sheet1)
         ws1 = wb.Sheets(1)
