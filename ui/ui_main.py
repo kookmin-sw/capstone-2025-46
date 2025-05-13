@@ -1,6 +1,7 @@
 import pandas as pd
 import shutil
 import sys
+from datetime import datetime
 
 import logging_config
 import utils
@@ -9,6 +10,7 @@ import models
 from PyQt5 import uic
 from PyQt5.QtGui import QStandardItemModel, QStandardItem
 from PyQt5.QtWidgets import QMainWindow, QFileDialog, QHeaderView, QAbstractItemView, QMessageBox
+import win32com.client as win32
 
 from worker import Worker
 
@@ -136,7 +138,8 @@ class MainWindow(QMainWindow):
             ai_result.get('child_count', ''),
             ai_result.get('discount', ''),
             ai_result.get('receipt_number', ''),
-            ai_result.get('note', '')
+            ai_result.get('note', ''),
+            ai_result.get('usage_purpose', '')
         ]
 
         # 모델에 새로운 행 추가
@@ -167,44 +170,70 @@ class MainWindow(QMainWindow):
 
         # DataFrame 생성
         df = pd.DataFrame(data, columns=models.header)
-        df = df[['승인일', '상호', '금액', '카드 번호']]
+        df = df[['승인일', '상호', '금액', '카드 번호', '사용 용도']]
         df['카드 번호'] = df['카드 번호'].apply(lambda x: x[-4:])
         df['증빙유무'] = '유'
 
-        # 모델에서 헤더 정보를 가져옵니다.
-        # headers = [model.headerData(i, Qt.Horizontal) for i in range(model.columnCount())]
-        # df.columns = headers  # DataFrame에 헤더를 설정
+        # 2. 파일 경로 및 복사
+        folder_path = self.txt_receipt_folder.text()
+        today_str = datetime.today().strftime("%Y%m%d")
+        template_path = os.path.join(root_path, "법인카드 사용내역.xlsx")
+        output_path = os.path.join(folder_path, f"법인카드 사용내역_작성본_{today_str}.xlsx")
 
-        # 저장할 파일 경로 선택 (파일 다이얼로그)
-        file_name, _ = QFileDialog.getSaveFileName(self, 'Save File', '', 'Excel Files (*.xlsx)')
-        if file_name:
-            with pd.ExcelWriter(file_name, engine='xlsxwriter') as writer:
-                # 첫 번째 시트에 데이터 저장
-                df.to_excel(writer, index=False, header=True, sheet_name='Sheet1')
+        shutil.copyfile(template_path, output_path)
 
-                # 워크북과 워크시트 객체 얻기
-                workbook = writer.book
-                worksheet1 = writer.sheets['Sheet1']
+        # 3. Excel 열기
+        excel = win32.gencache.EnsureDispatch('Excel.Application')
+        excel.Visible = False
+        wb = excel.Workbooks.Open(output_path)
 
-                # request 폴더에서 이미지 파일 리스트 가져오기
-                folder_path = self.txt_receipt_folder.text()
-                image_files = [f for f in os.listdir(folder_path) if f.lower().endswith('.jpg')]
+        # 4. 데이터 시트 처리 (Sheet1)
+        ws1 = wb.Sheets(1)
 
-                # 두 번째 시트에 이미지 추가
-                worksheet2 = workbook.add_worksheet('Sheet2')
+        today = datetime.today()
+        date_title = f"{today.year}년 {today.month}월 법인카드(출장용) 사용내역서(이윤로)"
+        ws1.Cells(1, 1).Value = date_title
 
-                done_folder = os.path.join(root_path, "done")
-                # 이미지 삽입 (여러 이미지를 순차적으로 삽입)
-                row = 0  # 첫 번째 행부터 시작
-                for image_file in image_files:
-                    image_path = os.path.join(folder_path, image_file)
-                    worksheet2.insert_image(row, 0, image_path)
-                    row += 40  # 각 이미지를 15행씩 간격을 두고 삽입 (적절히 조정)
+        start_row = 6
+        for i, row in df.iterrows():
+            ws1.Cells(start_row + i, 3).Value = row['카드 번호']  # C열
+            ws1.Cells(start_row + i, 4).Value = row['승인일']  # D열
+            ws1.Cells(start_row + i, 5).Value = row['상호']  # E열
+            ws1.Cells(start_row + i, 6).Value = row['사용 용도']  # F열
+            ws1.Cells(start_row + i, 7).Value = row['금액']  # G열
+            ws1.Cells(start_row + i, 10).Value = row['증빙유무']  # J열
 
-                # Excel 파일 저장
-                workbook.close()
+        # 5. 이미지 삽입 (Sheet2)
+        try:
+            ws2 = wb.Sheets("영수증 첨부")
+        except Exception:
+            ws2 = wb.Sheets.Add(After=wb.Sheets(wb.Sheets.Count))
+            ws2.Name = "영수증 첨부"
 
-            for image_file in image_files:
-                image_path = os.path.join(folder_path, image_file)
-                done_file_path = os.path.join(done_folder, image_file)
-                shutil.move(image_path, done_file_path)
+        image_files = [f for f in os.listdir(folder_path) if f.lower().endswith('.jpg')]
+        top = 10  # Y축 시작 위치
+        for image_file in image_files:
+            image_path = os.path.normpath(os.path.abspath(os.path.join(folder_path, image_file)))
+            if os.path.exists(image_path):
+                # AddPicture(경로, 링크?, 저장?, 좌측위치, 상단위치, 너비, 높이)
+                shape = ws2.Shapes.AddPicture(
+                    Filename=image_path,
+                    LinkToFile=False,
+                    SaveWithDocument=True,
+                    Left=10,  # X 위치 (A열 근처)
+                    Top=top,  # Y 위치
+                    Width=-1,  # 원본 크기 유지
+                    Height=-1
+                )
+                top += shape.Height + 20  # 다음 이미지 아래로 내리기 (조정 가능)
+
+        # 6. 저장 및 종료
+        wb.Save()
+        wb.Close()
+        excel.Quit()
+
+        done_folder = os.path.join(root_path, "done")
+        for image_file in image_files:
+            image_path = os.path.join(folder_path, image_file)
+            done_file_path = os.path.join(done_folder, image_file)
+            shutil.move(image_path, done_file_path)

@@ -4,7 +4,8 @@ from typing import Optional
 header = [
     "상호", "상호 ID", "주소", "카드 번호", "승인일", "금액", "거래 종류", "발행일",
     "발행 시간", "대표 전화", "열차 종류", "열차 번호", "출발지", "출발 시간",
-    "도착지", "도착 시간", "성인 수", "어린이 수", "할인", "영수증 번호", "비고"
+    "도착지", "도착 시간", "성인 수", "어린이 수", "할인", "영수증 번호", "비고",
+    "사용 용도"
 ]
 
 
@@ -30,3 +31,4 @@ class AiResult:
     discount: Optional[int]
     receipt_number: Optional[str]
     note: Optional[str]
+    usage_purpose: Optional[str]
