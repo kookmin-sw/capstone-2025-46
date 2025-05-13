@@ -1,0 +1,118 @@
+body {
+  font-family: Arial, sans-serif;
+  line-height: 1.6;
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 1rem;
+}
+header, section, footer {
+  margin-bottom: 2rem;
+}
+header h1 {
+  font-size: 2rem;
+  margin-bottom: 0.2rem;
+}
+h2 {
+  font-size: 1.5rem;
+  border-bottom: 2px solid #ddd;
+  padding-bottom: 0.3rem;
+}
+ol, ul {
+  margin-left: 1.2rem;
+}
+
+.navbar {
+  background: #f8f8f8;
+  padding: 0.5rem 1rem;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  border-bottom: 1px solid #ddd;
+}
+
+.menu {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  text-align: center;
+}
+
+.menu li {
+  display: inline;
+  margin: 0 0.5rem;
+  font-weight: bold;
+}
+
+/* li 사이에 구분자 “|” 넣기 */
+.menu li + li:before {
+  content: "|";
+  margin: 0 0.5rem;
+  color: #aaa;
+}
+
+/* 링크 스타일 */
+.menu a {
+  text-decoration: none;
+  color: #333;
+}
+
+.menu a:hover {
+  text-decoration: underline;
+}
+
+/* 버튼 컨테이너 */
+.presentation-links {
+  display: flex;
+  flex-direction: column;    /* 세로 정렬 */
+  gap: 1rem;                 /* 버튼 간격 */
+  margin-top: 1rem;
+  
+  align-items: flex-start;   /* 자식 아이템 폭을 내용물 크기에 맞춤 */
+}
+
+/* 기존 download-btn 에 width:auto 를 명시해도 됩니다 */
+.download-btn {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.6rem 1.2rem;
+  border: 2px solid #007bff;
+  border-radius: 0.5rem;
+  text-decoration: none;
+  font-weight: 500;
+  color: #007bff;
+  background-color: #fff;
+  transition: background-color 0.2s, color 0.2s;
+  
+  width: auto;               /* 기본 콘텐츠 너비에 맞춤 */
+  align-self: flex-start;    /* 개별 아이템도 좌측 정렬 */
+}
+
+/* 아이콘과 텍스트 간격 */
+.download-btn::before {
+  content: '';
+  display: inline-block;
+  width: 1.2rem;
+  height: 1.2rem;
+  margin-right: 0.5rem;
+  background-size: contain;
+  background-repeat: no-repeat;
+}
+
+/* 버튼별 아이콘 지정 (optional) */
+.download-btn[href$=".jpg"]::before {
+  background-image: url('data:image/svg+xml;utf8,<svg fill="%23007bff" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M5 20h14v-2H5v2zm7-18L5.33 9h3.34v4h6.66V9h3.34L12 2z"/></svg>');
+}
+.download-btn[href$=".pptx"]::before {
+  background-image: url('data:image/svg+xml;utf8,<svg fill="%23007bff" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14l4-4h12c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2z"/></svg>');
+}
+
+/* 호버 효과 */
+.download-btn:hover {
+  background-color: #007bff;
+  color: #fff;
+}
+
+section:target {
+  padding-top: 60px;   /* 네비바 높이 만큼 공간 확보 */
+  margin-top: -60px;   /* 레이아웃 밀림 보정 */
+}
